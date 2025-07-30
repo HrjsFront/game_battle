@@ -1,0 +1,648 @@
+/* Reset CSS dasar untuk konsistensi */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Arial", sans-serif;
+}
+
+body {
+  background: linear-gradient(to bottom, #4b0082, #8a2be2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* min-height: 100vh; */ /* <--- HAPUS ATAU UBAH INI */
+  min-height: auto; /* Izinkan tinggi menyesuaikan konten */
+  overflow-y: auto; /* <--- UBAH INI dari hidden menjadi auto atau scroll */
+  overflow-x: hidden; /* Pertahankan horizontal hidden jika tidak ada scroll horizontal */
+  padding-bottom: 20px; /* Opsional: tambahkan padding di bawah body agar ada ruang scroll */
+}
+
+.game-container {
+  width: 100%;
+  max-width: 400px;
+  /* height: 100vh; */ /* <--- HAPUS ATAU UBAH INI */
+  height: auto; /* Izinkan tinggi menyesuaikan konten */
+  min-height: 100vh; /* Agar tetap mengisi setidaknya 100% tinggi viewport jika kontennya sedikit */
+  background: #1a0033;
+  border-radius: 20px;
+  /* overflow: hidden; */ /* <--- HAPUS ATAU UBAH INI */
+  overflow-y: auto; /* Izinkan scrolling vertikal di dalam container */
+  overflow-x: hidden; /* Pertahankan horizontal hidden */
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  padding-top: 60px;
+}
+/* Header Game */
+/* Header Game */
+.game-header {
+  position: fixed; /* <--- UBAH INI: Agar header tetap di posisi tertentu di viewport */
+  top: 0; /* <--- Atur jarak dari atas viewport */
+  left: 50%; /* <--- Untuk menengahkan header secara horizontal */
+  transform: translateX(
+    -50%
+  ); /* <--- Untuk menengahkan header secara horizontal */
+  width: 100%; /* <--- Agar header mengambil lebar penuh */
+  max-width: 400px; /* <--- Penting: Sesuaikan dengan max-width game-container */
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background: linear-gradient(to right, #6a1b9a, #9c27b0);
+  color: white;
+  font-size: 1.2em;
+  font-weight: bold;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+  z-index: 50; /* <--- Berikan z-index tinggi agar header selalu di atas konten lain */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); /* Opsional: tambahkan bayangan agar menonjol */
+}
+
+.game-header .back-button,
+.game-header .help-button {
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+}
+
+.game-header .back-button img,
+.game-header .help-button img {
+  width: 100%;
+  height: 100%;
+}
+
+/* Arena Pertarungan */
+.battle-arena {
+  position: relative;
+  flex-grow: 1;
+
+  background-image: url("assets/icons/Background.png"); /* JALUR BACKGROUND DARI style.css */
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center bottom;
+
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-end;
+
+  padding-bottom: 70px; /* Jaga agar karakter berdiri di lantai ring */
+
+  overflow: hidden;
+  border-bottom: 5px solid #2c004d;
+}
+
+/* Elemen Karakter (Hugo dan Hehe) */
+.character {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  z-index: 1;
+  transition: opacity 0.3s ease-in-out;
+
+  /* MENGGESER KARAKTER KE POSISI YANG DIINGINKAN (DI DALAM RING) */
+  /* top: 0; */ /* Hapus jika ada */
+  /* transform: translateY(0); */ /* Hapus jika ada */
+  /* Kita akan geser karakter sedikit ke bawah dari tengah arena agar pas di ring */
+  margin-top: 70px; /* <--- NAIKKAN NILAI INI untuk memindahkan karakter lebih ke bawah */
+}
+
+.character img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Ikon VS (VS.png) */
+.vs-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* Tepat di tengah absolut */
+  z-index: 2;
+  width: 80px;
+  height: auto;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.vs-icon img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Kontainer untuk Animasi Battle di Tengah */
+.battle-animation-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(
+    -50%,
+    -60%
+  ); /* <--- SESUAIKAN NILAI INI jika masih perlu */
+  z-index: 3;
+  width: 300px;
+  height: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+  pointer-events: none;
+}
+
+.battle-animation-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* ==== KELAS UTAMA UNTUK MENGONTROL VISIBILITAS ==== */
+.hidden-element {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+.active-display {
+  display: flex !important;
+}
+.fade-in {
+  opacity: 1 !important;
+}
+
+/* Informasi Putaran */
+.round-info {
+  position: absolute;
+  top: 20px;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  padding: 5px 15px;
+  border-radius: 20px;
+  font-size: 0.9em;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+}
+
+/* Countdown Waktu Bet / Battle */
+.bet-time-countdown {
+  position: absolute;
+  bottom: 15px;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  padding: 8px 20px;
+  border-radius: 10px;
+  font-size: 1.1em;
+  font-weight: bold;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+}
+
+/* Area Taruhan */
+.betting-area {
+  display: flex;
+  justify-content: space-around;
+  padding: 15px 10px;
+  background: #2a004d;
+  border-bottom: 5px solid #1a0033;
+}
+
+.bet-option {
+  background: #4a0082;
+  border: 2px solid #6a1b9a;
+  border-radius: 10px;
+  padding: 10px 5px;
+  width: 30%;
+  text-align: center;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+.bet-option:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.5);
+}
+
+.bet-option.active {
+  border-color: #ffeb3b;
+  box-shadow: 0 0 15px #ffeb3b, 0 0 20px rgba(255, 235, 59, 0.5);
+}
+
+.bet-option .multiplier {
+  background: #ffc107;
+  color: #333;
+  font-weight: bold;
+  padding: 3px 8px;
+  border-radius: 5px;
+  font-size: 0.8em;
+  margin-bottom: 8px;
+}
+
+.bet-option .pot,
+.bet-option .me {
+  font-size: 0.9em;
+  margin-bottom: 3px;
+}
+
+.bet-option .icon-placeholder {
+  width: 50px;
+  height: 50px;
+  background-color: #5d00a1;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 5px;
+}
+.bet-option .icon-placeholder img {
+  width: 80%;
+  height: 80%;
+  object-fit: contain;
+}
+
+/* Footer Kontrol Bet */
+.bet-controls {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 15px 10px;
+  background: #1a0033;
+  color: white;
+  flex-wrap: wrap;
+}
+
+.current-winnings {
+  font-size: 0.9em;
+  margin-right: auto;
+  padding-left: 5px;
+}
+
+.user-balance {
+  display: flex;
+  align-items: center;
+  background: #4a0082;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 1em;
+  margin: 0 10px;
+}
+
+.user-balance img {
+  width: 20px;
+  height: 20px;
+  margin-right: 5px;
+}
+
+.user-balance .view-more {
+  margin-left: 5px;
+  font-size: 0.8em;
+  opacity: 0.7;
+  cursor: pointer;
+}
+
+.bet-amount-selector {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+}
+
+.bet-amount-selector button {
+  background: #ffc107;
+  color: #333;
+  border: none;
+  border-radius: 5px;
+  padding: 8px 12px;
+  font-size: 1.2em;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.bet-amount-selector button:hover {
+  background-color: #ffeb3b;
+}
+
+.bet-amount-selector input {
+  width: 60px;
+  text-align: center;
+  padding: 8px 5px;
+  border: 2px solid #6a1b9a;
+  background: #330066;
+  color: white;
+  font-size: 1.1em;
+  border-radius: 5px;
+  margin: 0 5px;
+  pointer-events: none;
+}
+
+/* Overlay Hasil Pertarungan */
+.result-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.result-overlay.fade-in {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.result-box {
+  background: linear-gradient(to bottom, #4a0082, #2a004d);
+  border: 3px solid #6a1b9a;
+  border-radius: 15px;
+  padding: 25px;
+  width: 90%;
+  max-width: 350px;
+  text-align: center;
+  color: white;
+  position: relative;
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.7);
+}
+
+.result-box .close-result {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  color: #ffeb3b;
+  font-size: 1.5em;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.result-text {
+  font-size: 1.8em;
+  font-weight: bold;
+  margin-bottom: 15px;
+  color: #ffeb3b;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.result-character-display {
+  margin-bottom: 20px;
+}
+
+.result-character-display img {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+  border-radius: 50%;
+  border: 4px solid #ffeb3b;
+  box-shadow: 0 0 15px #ffeb3b, 0 0 20px rgba(255, 235, 59, 0.5);
+  margin-bottom: 10px;
+}
+
+.result-victory-text {
+  display: block;
+  font-size: 1.5em;
+  font-weight: bold;
+  color: #76ff03;
+  text-shadow: 1px 1px 5px rgba(118, 255, 3, 0.5);
+}
+
+.bet-details {
+  background: #330066;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 5px 15px;
+  font-size: 0.95em;
+  text-align: left;
+}
+
+.detail-item span {
+  font-weight: bold;
+  color: #ffeb3b;
+}
+
+.biggest-winner-title {
+  font-size: 1.1em;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #c5cae9;
+}
+
+.biggest-winners-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.winner-item {
+  display: flex;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
+.winner-item img {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  margin-right: 10px;
+  border: 1px solid #ffeb3b;
+}
+
+.winner-item span {
+  flex-grow: 1;
+  text-align: left;
+}
+
+.winner-item .winner-coins {
+  font-weight: bold;
+  color: #76ff03;
+}
+
+.result-countdown {
+  font-size: 1.2em;
+  font-weight: bold;
+  color: #ffeb3b;
+}
+
+/* Bagian Riwayat Result */
+.history-container {
+  background: #2a004d;
+  color: white;
+  padding: 10px;
+  border-top: 5px solid #1a0033;
+  text-align: center;
+  overflow: hidden;
+}
+
+.history-title {
+  font-size: 1em;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.history-items {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  padding: 5px 0;
+}
+
+.history-item {
+  background: #4a0082;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 0.8em;
+  white-space: nowrap;
+  min-width: 80px;
+  text-align: center;
+  flex-shrink: 0;
+
+  animation: slideInFromRight 0.5s ease-out forwards;
+}
+
+.history-item.hugo {
+  background-color: #5cb85c;
+}
+
+.history-item.draw {
+  background-color: #ffc107;
+  color: #333;
+}
+
+.history-item.hehe {
+  background-color: #d9534f;
+  color: #333;
+}
+
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Bagian Leaderboard */
+.leaderboard-container {
+  background: #330066;
+  color: white;
+  padding: 15px 10px;
+  border-top: 5px solid #2a004d;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.leaderboard-tabs,
+.leaderboard-date-options {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 10px;
+  gap: 5px;
+}
+
+.tab-button,
+.date-button {
+  background: #4a0082;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9em;
+  flex-grow: 1;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.tab-button:hover,
+.date-button:hover {
+  background: #5d00a1;
+  transform: translateY(-1px);
+}
+
+.tab-button.active,
+.date-button.active {
+  background: #6a1b9a;
+  font-weight: bold;
+  box-shadow: 0 0 8px rgba(255, 235, 59, 0.4);
+}
+
+.leaderboard-list-container {
+  max-height: 200px; /* Pastikan ada max-height agar scroll berfungsi */
+  overflow-y: auto; /* Ini sudah ada, pastikan tidak tertimpa */
+  padding-right: 5px; /* Ruang untuk scrollbar */
+  border: 1px solid #4a0082;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.2);
+  flex-grow: 1;
+}
+
+.leaderboard-list {
+  padding: 5px 0;
+}
+
+.leaderboard-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 15px;
+  border-bottom: 1px solid #4a0082;
+  font-size: 0.9em;
+}
+
+.leaderboard-item:last-child {
+  border-bottom: none;
+}
+
+.rank {
+  width: 15%;
+  text-align: left;
+  font-weight: bold;
+  color: #c5cae9;
+}
+
+.username {
+  flex-grow: 1;
+  text-align: left;
+  margin-left: 10px;
+}
+
+.coins {
+  width: 30%;
+  text-align: right;
+  font-weight: bold;
+  color: #76ff03;
+}
+
+.hidden {
+  display: none !important;
+}

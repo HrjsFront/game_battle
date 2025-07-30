@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hugo vs Hehe - Battle Game</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <div class="game-container">
+      <div class="game-header">
+        <div class="back-button">
+          <img
+            style="width: 50px; height: 50px"
+            src="assets/icons/back_arrow.png"
+            alt="Back"
+          />
+        </div>
+        <div class="help-button">
+          <img src="assets/icons/help_icon.png" alt="Help" />
+        </div>
+      </div>
+
+      <div class="battle-arena">
+        <div class="character character-hugo">
+          <img
+            id="hugo-animation"
+            src="assets/hugo_idle/frame_01.png"
+            alt="Hugo"
+          />
+        </div>
+        <div class="vs-icon">
+          <img id="vs-animation" src="assets/icons/vs_logo.png" alt="VS" />
+        </div>
+        <div class="character character-hehe">
+          <img
+            id="hehe-animation"
+            src="assets/hehe_idle/frame_01.png"
+            alt="Hehe"
+          />
+        </div>
+        <div id="battle-animation-container" class="battle-animation-container">
+          <img id="battle-scene-animation" src="" alt="Battle Animation" />
+        </div>
+        <div class="round-info">
+          Round: <span id="current-round">130005</span>
+        </div>
+        <div class="bet-time-countdown">
+          <span id="bet-countdown">8s</span>
+        </div>
+      </div>
+
+      <div class="betting-area">
+        <div class="bet-option" data-option="hugo">
+          <div class="multiplier">X 2</div>
+          <div class="pot">Pot: <span id="hugo-pot">0</span></div>
+          <div class="me">Me: <span id="hugo-bet">0</span></div>
+          <div class="icon-placeholder">
+            <img src="assets/icons/hugo-icon.png" alt="Hugo" />
+          </div>
+        </div>
+
+        <div class="bet-option middle" data-option="draw">
+          <div class="multiplier">X 30</div>
+          <div class="pot">Pot: <span id="draw-pot">0</span></div>
+          <div class="me">Me: <span id="draw-bet">0</span></div>
+          <div class="icon-placeholder">
+            <img src="assets/icons/pngwing.com.png" alt="Draw" />
+          </div>
+        </div>
+
+        <div class="bet-option" data-option="hehe">
+          <div class="multiplier">X 2</div>
+          <div class="pot">Pot: <span id="hehe-pot">0</span></div>
+          <div class="me">Me: <span id="hehe-bet">0</span></div>
+          <div class="icon-placeholder">
+            <img src="assets/icons/hehe-icon.png" alt="Hehe" />
+          </div>
+        </div>
+      </div>
+
+      <div class="bet-controls">
+        <div class="current-winnings">Won: <span id="current-won">0</span></div>
+        <div class="user-balance">
+          <img src="assets/icons/pngimg.com - coin_PNG36871.png" alt="Coin" />
+          <span id="user-coins">1005</span>
+          <span class="view-more">></span>
+        </div>
+        <div class="bet-amount-selector">
+          <button class="bet-minus">-</button>
+          <input type="text" id="bet-input" value="10" readonly />
+          <button class="bet-plus">+</button>
+        </div>
+      </div>
+
+      <div class="leaderboard-container">
+        <div class="leaderboard-tabs">
+          <button class="tab-button active" data-tab="local">Local</button>
+          <button class="tab-button" data-tab="global">Global</button>
+        </div>
+        <div class="leaderboard-date-options">
+          <button class="date-button active" data-date="today">Today</button>
+          <button class="date-button" data-date="yesterday">Yesterday</button>
+        </div>
+        <div class="leaderboard-list-container">
+          <div
+            class="leaderboard-list"
+            id="local-today"
+            data-tab-content="local"
+            data-date-content="today"
+          ></div>
+          <div
+            class="leaderboard-list hidden"
+            id="local-yesterday"
+            data-tab-content="local"
+            data-date-content="yesterday"
+          ></div>
+          <div
+            class="leaderboard-list hidden"
+            id="global-today"
+            data-tab-content="global"
+            data-date-content="today"
+          ></div>
+          <div
+            class="leaderboard-list hidden"
+            id="global-yesterday"
+            data-tab-content="global"
+            data-date-content="yesterday"
+          ></div>
+        </div>
+      </div>
+
+      <div id="result-overlay" class="result-overlay hidden">
+        <div class="result-box">
+          <button class="close-result" id="close-result-button">X</button>
+          <div class="result-text">Result:</div>
+          <div class="result-character-display">
+            <img id="result-winner-img" src="" alt="Winner" />
+            <span id="result-victory-text">VICTORY</span>
+          </div>
+          <div class="bet-details">
+            <div class="detail-item">
+              ID: <span id="result-id">1119084843</span>
+            </div>
+            <div class="detail-item">
+              Bet: <span id="result-bet-amount">30</span>
+            </div>
+            <div class="detail-item">
+              Won: <span id="result-won-amount">20</span>
+            </div>
+          </div>
+          <div class="biggest-winner-title">Biggest winner of this round</div>
+          <div class="biggest-winners-list">
+            <div class="winner-item">
+              <img src="assets/icons/gambar-1.png" alt="Avatar" />
+              <span>Mr.Xyzin</span>
+              <span class="winner-coins">20</span>
+            </div>
+            <div class="winner-item">
+              <img src="assets/icons/gambar-2.png" alt="Avatar" />
+              <span>Re_Juve</span>
+              <span class="winner-coins">7000</span>
+            </div>
+          </div>
+          <div class="result-countdown">4s</div>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
