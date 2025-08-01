@@ -10,43 +10,40 @@ body {
   background: linear-gradient(to bottom, #4b0082, #8a2be2);
   display: flex;
   justify-content: center;
-  align-items: center;
-  /* min-height: 100vh; */ /* <--- HAPUS ATAU UBAH INI */
-  min-height: auto; /* Izinkan tinggi menyesuaikan konten */
-  overflow-y: auto; /* <--- UBAH INI dari hidden menjadi auto atau scroll */
-  overflow-x: hidden; /* Pertahankan horizontal hidden jika tidak ada scroll horizontal */
-  padding-bottom: 20px; /* Opsional: tambahkan padding di bawah body agar ada ruang scroll */
+  align-items: flex-start; /* Mengatur body untuk mulai dari atas */
+  min-height: 100vh; /* Minimum tinggi 100% viewport */
+  overflow-y: auto; /* Memungkinkan scrolling vertikal */
+  overflow-x: hidden; /* Mencegah scrolling horizontal */
+  padding-bottom: 20px; /* Padding di bagian bawah body */
 }
 
 .game-container {
   width: 100%;
   max-width: 400px;
-  /* height: 100vh; */ /* <--- HAPUS ATAU UBAH INI */
-  height: auto; /* Izinkan tinggi menyesuaikan konten */
+  height: auto; /* Tinggi menyesuaikan konten */
   min-height: 100vh; /* Agar tetap mengisi setidaknya 100% tinggi viewport jika kontennya sedikit */
   background: #1a0033;
   border-radius: 20px;
-  /* overflow: hidden; */ /* <--- HAPUS ATAU UBAH INI */
-  overflow-y: auto; /* Izinkan scrolling vertikal di dalam container */
-  overflow-x: hidden; /* Pertahankan horizontal hidden */
+  overflow-y: auto; /* Memungkinkan scrolling vertikal di dalam container */
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-  padding-top: 60px;
+  padding-top: 60px; /* Padding atas agar konten tidak tertutup header yang fixed */
 }
-/* Header Game */
+
 /* Header Game */
 .game-header {
-  position: fixed; /* <--- UBAH INI: Agar header tetap di posisi tertentu di viewport */
-  top: 0; /* <--- Atur jarak dari atas viewport */
-  left: 50%; /* <--- Untuk menengahkan header secara horizontal */
-  transform: translateX(
-    -50%
-  ); /* <--- Untuk menengahkan header secara horizontal */
-  width: 100%; /* <--- Agar header mengambil lebar penuh */
-  max-width: 400px; /* <--- Penting: Sesuaikan dengan max-width game-container */
-
+  position: fixed; /* Header tetap di posisi tertentu di viewport */
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 400px;
   display: flex;
+  /* flex-direction: column; */
+  /* flex-direction: ; */
+  align-items: center;
   justify-content: space-between;
   align-items: center;
   padding: 15px 20px;
@@ -55,8 +52,8 @@ body {
   font-size: 1.2em;
   font-weight: bold;
   text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
-  z-index: 50; /* <--- Berikan z-index tinggi agar header selalu di atas konten lain */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); /* Opsional: tambahkan bayangan agar menonjol */
+  z-index: 50; /* Berikan z-index tinggi agar header selalu di atas konten lain */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
 .game-header .back-button,
@@ -75,7 +72,7 @@ body {
 /* Arena Pertarungan */
 .battle-arena {
   position: relative;
-  flex-grow: 1;
+  flex-grow: 1; /* Agar mengisi ruang yang tersedia */
 
   background-image: url("assets/icons/Background.png"); /* JALUR BACKGROUND DARI style.css */
   background-repeat: no-repeat;
@@ -84,9 +81,9 @@ body {
 
   display: flex;
   justify-content: space-around;
-  align-items: flex-end;
+  align-items: center; /* Karakter di tengah vertikal arena */
 
-  padding-bottom: 70px; /* Jaga agar karakter berdiri di lantai ring */
+  padding-bottom: 30px; /* Posisi karakter diatur oleh margin-top */
 
   overflow: hidden;
   border-bottom: 5px solid #2c004d;
@@ -99,15 +96,11 @@ body {
   height: 150px;
   display: flex;
   justify-content: center;
-  align-items: flex-end;
+  align-items: flex-end; /* Memastikan gambar karakter menempel di bagian bawah div .character */
   z-index: 1;
   transition: opacity 0.3s ease-in-out;
 
-  /* MENGGESER KARAKTER KE POSISI YANG DIINGINKAN (DI DALAM RING) */
-  /* top: 0; */ /* Hapus jika ada */
-  /* transform: translateY(0); */ /* Hapus jika ada */
-  /* Kita akan geser karakter sedikit ke bawah dari tengah arena agar pas di ring */
-  margin-top: 70px; /* <--- NAIKKAN NILAI INI untuk memindahkan karakter lebih ke bawah */
+  margin-top: 70px; /* <--- POSISI FINAL KARAKTER: SESUAIKAN JIKA PERLU */
 }
 
 .character img {
@@ -141,8 +134,8 @@ body {
   left: 50%;
   transform: translate(
     -50%,
-    -60%
-  ); /* <--- SESUAIKAN NILAI INI jika masih perlu */
+    -50%
+  ); /* <--- POSISI FINAL ANIMASI BATTLE: SESUAIKAN JIKA PERLU */
   z-index: 3;
   width: 300px;
   height: 300px;
@@ -168,8 +161,11 @@ body {
 }
 
 .active-display {
-  display: flex !important;
+  display: flex !important; /* Untuk elemen yang display: flex */
 }
+/* Untuk elemen yang display: block atau inline-block, gunakan:
+.active-block-display { display: block !important; } */
+
 .fade-in {
   opacity: 1 !important;
 }
@@ -191,16 +187,16 @@ body {
 /* Countdown Waktu Bet / Battle */
 .bet-time-countdown {
   position: absolute;
-  bottom: 15px;
+  top: 65%; /* <--- POSISI FINAL COUNTDOWN: SESUAIKAN JIKA PERLU */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
   background: rgba(0, 0, 0, 0.6);
   color: white;
   padding: 8px 20px;
   border-radius: 10px;
   font-size: 1.1em;
   font-weight: bold;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 2;
 }
 
 /* Area Taruhan */
@@ -350,25 +346,30 @@ body {
 /* Overlay Hasil Pertarungan */
 .result-overlay {
   position: fixed;
-  top: 0;
+  /* Atur overlay untuk mulai dari luar layar bawah */
+  top: auto; /* Hapus top:0 atau auto */
+  bottom: -100%; /* Mulai 100% tinggi viewport di bawah layar */
   left: 0;
   width: 100%;
-  height: 100%;
+  height: 100%; /* Tetap full height agar bisa menutupi layar lain */
   background: rgba(0, 0, 0, 0.8);
-  display: none;
+  display: flex;
   justify-content: center;
   align-items: center;
   z-index: 100;
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
-  opacity: 0;
+  opacity: 0; /* Mulai tersembunyi */
   pointer-events: none;
-  transition: opacity 0.3s ease-in-out;
+  /* Transisi untuk opacity DAN transform */
+  transition: opacity 0.3s ease-in-out, transform 0.5s ease-out; /* Transform untuk efek slide */
 }
 
+/* Ketika overlay muncul, geser ke atas */
 .result-overlay.fade-in {
   opacity: 1;
   pointer-events: auto;
+  transform: translateY(-100%); /* Geser ke atas 100% dari tingginya sendiri */
 }
 
 .result-box {
@@ -382,6 +383,16 @@ body {
   color: white;
   position: relative;
   box-shadow: 0 0 25px rgba(0, 0, 0, 0.7);
+  /* Penting: Berikan transform agar bisa digeser bersama overlay */
+  transform: translateY(
+    100%
+  ); /* Mulai di luar kotak overlay, lalu geser ke dalam */
+  transition: transform 0.5s ease-out; /* Transisi untuk result-box itu sendiri */
+}
+
+/* Geser result-box ke posisi normal saat result-overlay fade-in */
+.result-overlay.fade-in .result-box {
+  transform: translateY(0);
 }
 
 .result-box .close-result {
@@ -527,7 +538,7 @@ body {
 }
 
 .history-item.hugo {
-  background-color: #5cb85c;
+  background-color: #ff0000;
 }
 
 .history-item.draw {
@@ -536,8 +547,8 @@ body {
 }
 
 .history-item.hehe {
-  background-color: #d9534f;
-  color: #333;
+  background-color: #3238fc;
+  color: #ffffff;
 }
 
 @keyframes slideInFromRight {
@@ -562,16 +573,24 @@ body {
   flex-direction: column;
 }
 
-.leaderboard-tabs,
+/* .leaderboard-tabs,
 .leaderboard-date-options {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 10px;
+  gap: 5px;
+} */
+.leaderboard-date-options {
+  /* Ini akan menjadi baris tombol utama sekarang */
   display: flex;
   justify-content: space-around;
   margin-bottom: 10px;
   gap: 5px;
 }
 
-.tab-button,
+/* .tab-button, */
 .date-button {
+  /* Hanya tersisa .date-button */
   background: #4a0082;
   color: white;
   border: none;
@@ -583,13 +602,22 @@ body {
   transition: background-color 0.2s, transform 0.1s;
 }
 
-.tab-button:hover,
+/* .tab-button:hover,
+.date-button:hover {
+  background: #5d00a1;
+  transform: translateY(-1px);
+} */
 .date-button:hover {
   background: #5d00a1;
   transform: translateY(-1px);
 }
 
-.tab-button.active,
+/* .tab-button.active,
+.date-button.active {
+  background: #6a1b9a;
+  font-weight: bold;
+  box-shadow: 0 0 8px rgba(255, 235, 59, 0.4);
+} */
 .date-button.active {
   background: #6a1b9a;
   font-weight: bold;
@@ -597,9 +625,9 @@ body {
 }
 
 .leaderboard-list-container {
-  max-height: 200px; /* Pastikan ada max-height agar scroll berfungsi */
-  overflow-y: auto; /* Ini sudah ada, pastikan tidak tertimpa */
-  padding-right: 5px; /* Ruang untuk scrollbar */
+  max-height: 200px;
+  overflow-y: auto;
+  padding-right: 5px;
   border: 1px solid #4a0082;
   border-radius: 8px;
   background: rgba(0, 0, 0, 0.2);

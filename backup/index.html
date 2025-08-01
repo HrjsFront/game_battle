@@ -11,14 +11,14 @@
     <div class="game-container">
       <div class="game-header">
         <div class="back-button">
-          <img
+          <!-- <img
             style="width: 50px; height: 50px"
-            src="assets/icons/back_arrow.png"
+            src="assets/icons/—Pngtree—blue back button left_5404507.png"
             alt="Back"
-          />
+          /> -->
         </div>
         <div class="help-button">
-          <img src="assets/icons/help_icon.png" alt="Help" />
+          <img src="assets/icons/klipartz.com.png" alt="Help" />
         </div>
       </div>
 
@@ -31,7 +31,11 @@
           />
         </div>
         <div class="vs-icon">
-          <img id="vs-animation" src="assets/icons/vs_logo.png" alt="VS" />
+          <img
+            id="vs-animation"
+            src="assets/icons/Vs-Logo-PNG-Clipart.png"
+            alt="VS"
+          />
         </div>
         <div class="character character-hehe">
           <img
@@ -59,6 +63,7 @@
           <div class="icon-placeholder">
             <img src="assets/icons/hugo-icon.png" alt="Hugo" />
           </div>
+          <p>HUGO</p>
         </div>
 
         <div class="bet-option middle" data-option="draw">
@@ -66,8 +71,9 @@
           <div class="pot">Pot: <span id="draw-pot">0</span></div>
           <div class="me">Me: <span id="draw-bet">0</span></div>
           <div class="icon-placeholder">
-            <img src="assets/icons/pngwing.com.png" alt="Draw" />
+            <img src="assets/icons/draw-icon.png" alt="Draw" />
           </div>
+          <p>DRAW</p>
         </div>
 
         <div class="bet-option" data-option="hehe">
@@ -77,6 +83,7 @@
           <div class="icon-placeholder">
             <img src="assets/icons/hehe-icon.png" alt="Hehe" />
           </div>
+          <p>HEHE</p>
         </div>
       </div>
 
@@ -94,11 +101,12 @@
         </div>
       </div>
 
+      <div class="history-container">
+        <div class="history-title">Result History</div>
+        <div class="history-items"></div>
+      </div>
+
       <div class="leaderboard-container">
-        <div class="leaderboard-tabs">
-          <button class="tab-button active" data-tab="local">Local</button>
-          <button class="tab-button" data-tab="global">Global</button>
-        </div>
         <div class="leaderboard-date-options">
           <button class="date-button active" data-date="today">Today</button>
           <button class="date-button" data-date="yesterday">Yesterday</button>
@@ -106,37 +114,24 @@
         <div class="leaderboard-list-container">
           <div
             class="leaderboard-list"
-            id="local-today"
-            data-tab-content="local"
+            id="today-list"
             data-date-content="today"
           ></div>
           <div
             class="leaderboard-list hidden"
-            id="local-yesterday"
-            data-tab-content="local"
-            data-date-content="yesterday"
-          ></div>
-          <div
-            class="leaderboard-list hidden"
-            id="global-today"
-            data-tab-content="global"
-            data-date-content="today"
-          ></div>
-          <div
-            class="leaderboard-list hidden"
-            id="global-yesterday"
-            data-tab-content="global"
+            id="yesterday-list"
             data-date-content="yesterday"
           ></div>
         </div>
       </div>
 
-      <div id="result-overlay" class="result-overlay hidden">
+      <div id="result-overlay" class="result-overlay">
         <div class="result-box">
           <button class="close-result" id="close-result-button">X</button>
           <div class="result-text">Result:</div>
           <div class="result-character-display">
             <img id="result-winner-img" src="" alt="Winner" />
+            <br />
             <span id="result-victory-text">VICTORY</span>
           </div>
           <div class="bet-details">
