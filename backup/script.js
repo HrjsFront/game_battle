@@ -722,6 +722,18 @@ function handleLeaderboardDateClick(event) {
  * Menambahkan hasil putaran ke riwayat game dan memperbarui tampilan.
  * @param {string} winner - 'hugo', 'hehe', atau 'draw'.
  */
+// ... (Bagian script.js sebelum fungsi updateGameHistory) ...
+
+/**
+ * Menambahkan hasil putaran ke riwayat game dan memperbarui tampilan.
+ * @param {string} winner - 'hugo', 'hehe', atau 'draw'.
+ */
+// ... (Bagian script.js sebelum fungsi updateGameHistory) ...
+
+/**
+ * Menambahkan hasil putaran ke riwayat game dan memperbarui tampilan.
+ * @param {string} winner - 'hugo', 'hehe', atau 'draw'.
+ */
 function updateGameHistory(winner) {
   gameHistory.unshift(winner);
   if (gameHistory.length > 10) {
@@ -733,17 +745,34 @@ function updateGameHistory(winner) {
       .map((result) => {
         let className = "";
         let text = "";
+        let iconSrc = ""; // Variabel baru untuk jalur ikon
+
         if (result === "hugo") {
           className = "hugo";
           text = "Hugo Win";
+          iconSrc = "assets/icons/hugo-icon.png"; // Jalur ikon Hugo
         } else if (result === "draw") {
           className = "draw";
           text = "Draw";
+          iconSrc = "assets/icons/draw-icon.png"; // Jalur ikon Draw
         } else if (result === "hehe") {
           className = "hehe";
           text = "Hehe Win";
+          iconSrc = "assets/icons/hehe-icon.png"; // Jalur ikon Hehe
         }
-        return `<div class="history-item ${className}">${text}</div>`;
+
+        // DEBUG LOG: Cek nilai yang dihasilkan
+        console.log(
+          `[History Item] Result: ${result}, Class: ${className}, Text: ${text}, IconSrc: ${iconSrc}`
+        );
+
+        // Mengembalikan HTML yang menyertakan <img> untuk ikon
+        return `
+                <div class="history-item ${className}">
+                    <img src="${iconSrc}" alt="${text}" class="history-icon">
+                    <span class="history-text">${text}</span>
+                </div>
+            `;
       })
       .join("");
   }

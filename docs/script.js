@@ -20,11 +20,11 @@ const animations = {
     fps: 20,
   },
   battleAnimation: {
-    frames: 60,
+    frames: 47,
     prefix: "frame_",
     path: "assets/battle_animation/",
     loop: false,
-    fps: 10,
+    fps: 15,
   },
   hugoWin: {
     frames: 14,
@@ -55,11 +55,11 @@ const animations = {
     fps: 10,
   },
   drawAnimation: {
-    frames: 1,
+    frames: 8,
     prefix: "frame_",
     path: "assets/draw_animation/",
     loop: false,
-    fps: 0,
+    fps: 10,
   },
 };
 
@@ -79,10 +79,13 @@ const battleSceneAnimationImg = document.getElementById(
 
 const betCountdownSpan = document.getElementById("bet-countdown");
 const currentRoundSpan = document.getElementById("current-round");
-const betOptions = document.querySelectorAll(".bet-option");
-const betInput = document.getElementById("bet-input");
+const betOptions = document.querySelectorAll(".bet-option"); // Semua opsi taruhan (Hugo, Draw, Hehe)
+
+// === PERUBAHAN: bet-amount-selector sekarang memilih kelipatan ===
+const betInput = document.getElementById("bet-input"); // Teks input akan menampilkan kelipatan
 const betMinusBtn = document.querySelector(".bet-minus");
 const betPlusBtn = document.querySelector(".bet-plus");
+
 const userCoinsSpan = document.getElementById("user-coins");
 const currentWonSpan = document.getElementById("current-won");
 
@@ -96,35 +99,43 @@ const resultWonAmountSpan = document.getElementById("result-won-amount");
 const resultCountdownSpan = document.querySelector(".result-countdown");
 const biggestWinnersList = document.querySelector(".biggest-winners-list");
 
-// === ELEMEN BARU UNTUK RIWAYAT DAN LEADERBOARD ===
-const historyItemsContainer = document.querySelector(".history-items"); // Untuk riwayat hasil putaran
-// Tombol Local/Global sudah dihapus dari HTML
+// === ELEMEN UNTUK RIWAYAT DAN LEADERBOARD ===
+const historyItemsContainer = document.querySelector(".history-items");
 const leaderboardDateOptions = document.querySelectorAll(
   ".leaderboard-date-options .date-button"
-); // Tombol Today/Yesterday
-const leaderboardLists = document.querySelectorAll(".leaderboard-list"); // Kontainer daftar peringkat
+);
+const leaderboardLists = document.querySelectorAll(".leaderboard-list");
 
 // Variabel state permainan
-let currentBetAmount = parseInt(betInput.value);
-let selectedBetOption = null;
+let currentBetMultiplier = 10; // Kelipatan bet yang sedang aktif (default 10)
+const betMultipliers = [10, 100, 300, 500, 1000]; // Daftar kelipatan yang tersedia
+let currentMultiplierIndex = 0; // Indeks kelipatan yang aktif di array
+
+let userBets = {
+  // Objek untuk menyimpan jumlah bet per opsi
+  hugo: 0,
+  draw: 0,
+  hehe: 0,
+};
+let totalCurrentBet = 0; // Total bet yang dipasang di semua opsi
+
 let userBalance = parseInt(userCoinsSpan.textContent);
 let currentRound = parseInt(currentRoundSpan.textContent);
-let gameHistory = []; // Array untuk menyimpan hasil putaran terakhir (misal 10 putaran terakhir)
+let gameHistory = [];
 
-// Timer IDs untuk clearInterval agar bisa menghentikan timer yang sedang berjalan
+// Timer IDs
 let betTimer;
 let resultTimer;
 let battleDurationTimer;
-let winLoseAnimationTimer; // Timer untuk animasi menang/kalah di arena
+let winLoseAnimationTimer;
 
-// requestAnimationFrame IDs untuk menghentikan animasi spesifik
 let hugoAnimationFrameId;
 let heheAnimationFrameId;
 let battleSceneAnimationFrameId;
 
-let isBattleInProgress = false; // Flag untuk status fase battle
+let isBattleInProgress = false;
 
-// === DATA DUMMY UNTUK LEADERBOARD (SEKARANG LANGSUNG 'today' dan 'yesterday') ===
+// === DATA DUMMY UNTUK LEADERBOARD ===
 const leaderboardData = {
   today: [
     { rank: 1, username: "TopPlayer1", coins: 25000 },
@@ -295,6 +306,12 @@ function startBetCountdown() {
   document.getElementById("hugo-pot").textContent = "0";
   document.getElementById("draw-pot").textContent = "0";
   document.getElementById("hehe-pot").textContent = "0";
+
+  // Reset tampilan bet user (Me:) dan total bet
+  userBets.hugo = 0;
+  userBets.draw = 0;
+  userBets.hehe = 0;
+  totalCurrentBet = 0;
   document.getElementById("hugo-bet").textContent = "0";
   document.getElementById("draw-bet").textContent = "0";
   document.getElementById("hehe-bet").textContent = "0";
@@ -304,8 +321,8 @@ function startBetCountdown() {
     option.classList.remove("active");
     option.style.pointerEvents = "auto"; // Aktifkan klik
   });
-  betMinusBtn.style.pointerEvents = "auto";
-  betPlusBtn.style.pointerEvents = "auto";
+  betMinusBtn.style.pointerEvents = "auto"; // Tombol kelipatan
+  betPlusBtn.style.pointerEvents = "auto"; // Tombol kelipatan
 
   // Tampilkan kembali karakter Hugo, Hehe, dan ikon VS
   hugoAnimationImg.classList.remove("hidden-element");
@@ -340,8 +357,17 @@ function startBetCountdown() {
       betCountdownSpan.textContent = "0s";
       // Kunci taruhan setelah waktu habis
       betOptions.forEach((option) => (option.style.pointerEvents = "none"));
-      betMinusBtn.style.pointerEvents = "none";
-      betPlusBtn.style.pointerEvents = "none";
+      betMinusBtn.style.pointerEvents = "none"; // Kunci tombol kelipatan
+      betPlusBtn.style.pointerEvents = "none"; // Kunci tombol kelipatan
+
+      // Jika tidak ada bet yang dipasang, mungkin perlu default action atau auto-bet
+      if (totalCurrentBet === 0) {
+        // Opsional: Lakukan auto-bet minimal jika tidak ada taruhan
+        // atau langsung lanjut tanpa taruhan
+        console.log("No bets placed. Continuing without bets.");
+        // Misalnya: userBets.hugo = 10; totalCurrentBet = 10;
+      }
+
       simulateBattle(); // Lanjutkan ke fase simulasi pertarungan
     }
   }, 1000);
@@ -412,7 +438,7 @@ function showWinLoseAnimationInArena() {
 
   // ==== LOGIKA PENENTUAN PEMENANG (SANGAT SIMPLIFIKASI untuk frontend saja) ====
   // Ini harusnya datang dari server di aplikasi nyata
-  const outcomes = ["hugo", "hehe", "draw"];
+  const outcomes = ["hugo", "draw", "hehe"]; // Pastikan urutannya sama
   const randomOutcome = outcomes[Math.floor(Math.random() * outcomes.length)];
 
   // Tampilkan kembali karakter Hugo dan Hehe di arena
@@ -467,7 +493,7 @@ function showWinLoseAnimationInArena() {
 function showResult(finalOutcome) {
   // Flag untuk memastikan fungsi hanya berjalan sekali per putaran hasil
   if (!resultOverlay.classList.contains("fade-in")) {
-    console.log("Showing Result Overlay!");
+    console.log("Showing Result Overlay!"); // DEBUG LOG
     stopAllAnimations(); // Hentikan animasi menang/kalah di arena
     clearInterval(winLoseAnimationTimer); // Pastikan timer animasi menang/kalah berhenti
 
@@ -510,7 +536,11 @@ function showResult(finalOutcome) {
     }
 
     resultIdSpan.textContent = "1119084843";
-    resultBetAmountSpan.textContent = selectedBetOption ? currentBetAmount : 0;
+    // Ambil bet yang dipasang pada opsi yang menang saja untuk tampilan di overlay
+    // Atau total bet yang dipasang jika Anda ingin menampilkan total bet user
+    resultBetAmountSpan.textContent = selectedBetOption
+      ? userBets[selectedBetOption]
+      : 0; // Mengambil bet spesifik
 
     if (selectedBetOption === finalOutcome) {
       let multiplier = 0;
@@ -519,13 +549,15 @@ function showResult(finalOutcome) {
       } else if (selectedBetOption === "draw") {
         multiplier = 30;
       }
-      wonAmount = currentBetAmount * multiplier;
+      wonAmount = userBets[selectedBetOption] * multiplier; // Hitung kemenangan berdasarkan bet pada opsi yang menang
       userBalance += wonAmount;
       currentWonSpan.textContent = wonAmount;
     } else {
       wonAmount = 0;
-      if (selectedBetOption) {
-        userBalance -= currentBetAmount;
+      // Hanya kurangi koin jika user benar-benar pasang bet dan kalah
+      if (totalCurrentBet > 0) {
+        // Kurangi total bet yang dipasang jika kalah
+        userBalance -= totalCurrentBet;
       }
       currentWonSpan.textContent = "0";
     }
@@ -544,19 +576,22 @@ function showResult(finalOutcome) {
                 <span class="coins">7000</span>
             </div>
         `;
-    // === PERBAIKAN: Update Riwayat Result ===
+    // Update Riwayat Result
     updateGameHistory(finalOutcome);
 
     // Memulai countdown untuk menutup overlay hasil
     let resultTimeLeft = 5;
     resultCountdownSpan.textContent = `${resultTimeLeft}s`;
-    if (resultTimer) clearInterval(resultTimer);
+    console.log("Result countdown initialized to:", resultTimeLeft); // DEBUG LOG
+    if (resultTimer) clearInterval(resultTimer); // Pastikan timer sebelumnya berhenti
 
     resultTimer = setInterval(() => {
       resultTimeLeft--;
       resultCountdownSpan.textContent = `${resultTimeLeft}s`;
+      console.log("Result countdown update:", resultTimeLeft); // DEBUG LOG
       if (resultTimeLeft <= 0) {
         clearInterval(resultTimer);
+        console.log("Result countdown finished."); // DEBUG LOG
         hideResultAndStartNewRound();
       }
     }, 1000);
@@ -581,9 +616,20 @@ function hideResultAndStartNewRound() {
   // Reset status taruhan dan UI terkait
   selectedBetOption = null;
   betOptions.forEach((option) => option.classList.remove("active"));
-  currentBetAmount = 10;
-  betInput.value = currentBetAmount;
-  currentWonSpan.textContent = "0";
+  currentBetMultiplier = 10; // Reset kelipatan bet ke default 10
+  betInput.value = currentBetMultiplier; // Update tampilan kelipatan
+
+  // Reset semua bet yang dipasang user dan total bet
+  userBets.hugo = 0;
+  userBets.draw = 0;
+  userBets.hehe = 0;
+  totalCurrentBet = 0;
+  // Reset tampilan bet (Me:) di opsi taruhan
+  document.getElementById("hugo-bet").textContent = "0";
+  document.getElementById("draw-bet").textContent = "0";
+  document.getElementById("hehe-bet").textContent = "0";
+
+  currentWonSpan.textContent = "0"; // Reset jumlah kemenangan di footer
 
   currentRound++;
   currentRoundSpan.textContent = currentRound;
@@ -594,80 +640,69 @@ function hideResultAndStartNewRound() {
 // Bagian 4: Event Listeners (Interaksi Pengguna)
 // =========================================================
 
-// Event listener untuk pilihan taruhan (Hugo, Seri, Hehe)
-betOptions.forEach((option) => {
-  option.addEventListener("click", () => {
-    if (isBattleInProgress) return;
-
-    if (selectedBetOption === option.dataset.option) {
-      selectedBetOption = null;
-      option.classList.remove("active");
-      document.getElementById(`${option.dataset.option}-bet`).textContent = "0";
-      return;
-    }
-
-    betOptions.forEach((opt) => {
-      opt.classList.remove("active");
-      document.getElementById(`${opt.dataset.option}-bet`).textContent = "0";
-    });
-
-    option.classList.add("active");
-    selectedBetOption = option.dataset.option;
-
-    document.getElementById(`${selectedBetOption}-bet`).textContent =
-      currentBetAmount;
-  });
-});
-
-// Event listener untuk tombol (-) mengurangi jumlah taruhan
+// === Event listener untuk tombol (-) dan (+) kelipatan bet ===
 betMinusBtn.addEventListener("click", () => {
   if (isBattleInProgress) return;
-  if (currentBetAmount > 10) {
-    currentBetAmount -= 10;
-    betInput.value = currentBetAmount;
-    if (selectedBetOption) {
-      document.getElementById(`${selectedBetOption}-bet`).textContent =
-        currentBetAmount;
-    }
+  currentMultiplierIndex--;
+  if (currentMultiplierIndex < 0) {
+    currentMultiplierIndex = 0; // Batasi agar tidak kurang dari indeks pertama
   }
+  currentBetMultiplier = betMultipliers[currentMultiplierIndex];
+  betInput.value = currentBetMultiplier;
+  // Tidak perlu update bet di opsi karena bet ditambah per klik di opsi
 });
 
-// Event listener untuk tombol (+) menambah jumlah taruhan
 betPlusBtn.addEventListener("click", () => {
   if (isBattleInProgress) return;
-  if (currentBetAmount + 10 <= userBalance) {
-    currentBetAmount += 10;
-    betInput.value = currentBetAmount;
-    if (selectedBetOption) {
-      document.getElementById(`${selectedBetOption}-bet`).textContent =
-        currentBetAmount;
-    }
-  } else if (currentBetAmount < userBalance) {
-    currentBetAmount = userBalance;
-    betInput.value = currentBetAmount;
-    if (selectedBetOption) {
-      document.getElementById(`${selectedBetOption}-bet`).textContent =
-        currentBetAmount;
-    }
-  } else {
-    console.log("Saldo tidak cukup untuk menambah bet lebih banyak!");
+  currentMultiplierIndex++;
+  if (currentMultiplierIndex >= betMultipliers.length) {
+    currentMultiplierIndex = betMultipliers.length - 1; // Batasi agar tidak lebih dari indeks terakhir
   }
+  currentBetMultiplier = betMultipliers[currentMultiplierIndex];
+  betInput.value = currentBetMultiplier;
+  // Tidak perlu update bet di opsi karena bet ditambah per klik di opsi
+});
+
+// === Event listener untuk pilihan taruhan (Hugo, Seri, Hehe) ===
+betOptions.forEach((option) => {
+  option.addEventListener("click", () => {
+    if (isBattleInProgress) return; // Jangan izinkan taruhan saat battle berlangsung
+
+    const optionType = option.dataset.option; // 'hugo', 'draw', atau 'hehe'
+    let currentBetForOption = userBets[optionType];
+
+    // Memeriksa apakah saldo cukup untuk menambah kelipatan
+    if (userBalance >= totalCurrentBet + currentBetMultiplier) {
+      currentBetForOption += currentBetMultiplier;
+      userBets[optionType] = currentBetForOption; // Update bet untuk opsi ini
+      totalCurrentBet += currentBetMultiplier; // Update total bet
+
+      document.getElementById(`${optionType}-bet`).textContent =
+        userBets[optionType]; // Update UI "Me:"
+    } else {
+      console.log("Saldo tidak cukup untuk menambah bet ini!");
+      // Opsional: berikan feedback visual kepada user
+    }
+  });
 });
 
 // Event listener untuk menutup overlay hasil secara manual
 closeResultButton.addEventListener("click", hideResultAndStartNewRound);
 
+// === EVENT LISTENERS UNTUK LEADERBOARD ===
+leaderboardDateOptions.forEach((dateBtn) => {
+  dateBtn.addEventListener("click", handleLeaderboardDateClick);
+});
+
 // =========================================================
 // Bagian 5: Fungsi Leaderboard & Riwayat Result
 // =========================================================
 
-// Fungsi untuk mengelola leaderboard - HANYA TODAY/YESTERDAY
 /**
  * Mengisi daftar leaderboard berdasarkan tanggal (today/yesterday).
  * @param {string} date - 'today' atau 'yesterday'.
  */
 function populateLeaderboard(date) {
-  // ID daftar sekarang hanya today-list atau yesterday-list
   const listContainer = document.getElementById(`${date}-list`);
   if (listContainer && leaderboardData && leaderboardData[date]) {
     listContainer.innerHTML = leaderboardData[date]
@@ -689,11 +724,6 @@ function populateLeaderboard(date) {
     }
   }
 }
-
-// Event listeners untuk tombol opsi tanggal leaderboard (Today/Yesterday)
-leaderboardDateOptions.forEach((dateBtn) => {
-  dateBtn.addEventListener("click", handleLeaderboardDateClick);
-});
 
 /**
  * Menangani klik pada tombol opsi tanggal leaderboard (Today/Yesterday).
@@ -755,6 +785,9 @@ function updateGameHistory(winner) {
 
 // Fungsi yang akan dijalankan setelah seluruh DOM (HTML) selesai dimuat
 document.addEventListener("DOMContentLoaded", () => {
+  // Inisialisasi tampilan kelipatan bet
+  betInput.value = currentBetMultiplier;
+
   // Memuat semua gambar animasi ke memori saat game dimulai
   for (const animKey in animations) {
     preloadAnimation(animations[animKey]);
