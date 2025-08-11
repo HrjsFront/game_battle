@@ -762,18 +762,22 @@ function updateGameHistory(winner) {
     historyItemsContainer.innerHTML = gameHistory
       .map((result) => {
         let className = "";
-        let text = "";
+        let iconSrc = "";
+        let altText = "";
         if (result === "hugo") {
           className = "hugo";
-          text = "Hugo Win";
-        } else if (result === "draw") {
-          className = "draw";
-          text = "Draw";
+          iconSrc = "assets/icons/hugo-icon.png";
+          altText = "Hugo";
         } else if (result === "hehe") {
           className = "hehe";
-          text = "Hehe Win";
+          iconSrc = "assets/icons/hehe-icon.png";
+          altText = "Hehe";
+        } else {
+          className = "draw";
+          iconSrc = "assets/icons/draw-icon.png";
+          altText = "Draw";
         }
-        return `<div class="history-item ${className}">${text}</div>`;
+        return `<div class="history-item ${className}"><img src="${iconSrc}" alt="${altText}" style="width:32px;height:32px;object-fit:contain;" /></div>`;
       })
       .join("");
   }
